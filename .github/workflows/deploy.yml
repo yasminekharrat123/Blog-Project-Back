@@ -11,11 +11,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up SSH connection
-        uses: webfactory/ssh-agent@v0.5.2
+      - name: SSH into EC2 Instance
+        uses: appleboy/ssh-action@master
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: SSH commands
-        run: |
-          ssh -o "StrictHostKeyChecking=no" username@yourserverip 'bash -s' < Blog-Project-Back.sh
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/celebr8-v2-client
+            git checkout production
+            git pull origin production
+            echo "Using Node version: $(node -v)"
+            echo "Using Yarn version: $(yarn -v)"
+            yarn install
+            yarn build
+            pm2 delete celebr8-app
+            pm2 start npm --name celebr8-app -- run start -- -p 3000
