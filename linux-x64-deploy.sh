@@ -1,4 +1,4 @@
-cd Blog-Project-Back
+cd /root/Blog-Project-Back
 pm2 stop blog
 
 git checkout master
