@@ -11,12 +11,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: SSH into EC2 Instance
+      - name: SSH into Digital Ocean Droplet
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
           script: |
             cd ~/Blog-Project-Back
             git checkout master
