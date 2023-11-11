@@ -18,12 +18,8 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/celebr8-v2-client
-            git checkout production
-            git pull origin production
-            echo "Using Node version: $(node -v)"
-            echo "Using Yarn version: $(yarn -v)"
-            yarn install
-            yarn build
-            pm2 delete celebr8-app
-            pm2 start npm --name celebr8-app -- run start -- -p 3000
+            cd ~/Blog-Project-Back
+            git checkout master
+            git pull origin master
+            chmod +x linux-x64-deploy.sh
+            ./linux-x64-deploy.sh
