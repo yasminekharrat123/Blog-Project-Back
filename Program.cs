@@ -26,7 +26,7 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
 
-app.MapGet("/", () => "Hello World");
+app.MapGet("/", () => "Hello Everyone!");
 
 
 app.Run();
