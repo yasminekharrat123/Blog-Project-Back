@@ -21,6 +21,7 @@ jobs:
           script: |
             cd ~/Blog-Project-Back
             git checkout master
+            git stash
             git pull origin master
             chmod +x linux-x64-deploy.sh
             ./linux-x64-deploy.sh
