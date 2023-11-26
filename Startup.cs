@@ -1,3 +1,5 @@
+using AI;
+
 public class Startup
 
 {
@@ -18,6 +20,9 @@ public class Startup
             string openAiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new Exception("OPENAI_API_KEY environment variable is not set.");
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {openAiApiKey}");
         });
+        
+        services.AddTransient<IOpenAIService, OpenAIService>();
+
         
 
     }
@@ -45,3 +50,4 @@ public class Startup
             });
         }
     }
+

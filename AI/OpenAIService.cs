@@ -1,39 +1,19 @@
-
-using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
-[Route("[controller]")]
-[ApiController]
-public class OpenAIController : ControllerBase
+namespace AI {
+public interface IOpenAIService
 {
-      private readonly HttpClient _httpClient;
-
-     public OpenAIController(IHttpClientFactory httpClientFactory)
-    {
-        _httpClient = httpClientFactory.CreateClient("OpenAI");
-    }
-
-    [HttpPost("evaluate")]
-  public async Task<IActionResult> EvaluateIdea([FromBody] Blog.Models.Blog blog)
-{
-    try
-    {
-        string endpoint = "chat/completions";
-        var result = await Evaluate(_httpClient, endpoint, blog);
-
-        var jsonObject = JObject.Parse(result)?["choices"]?[0]?["message"]?["function_call"]?["arguments"];
-
-        return Ok(jsonObject?.ToString());
-    }
-    catch (Exception ex)
-    {
-        return BadRequest($"Error: {ex.Message}");
-    }
+     string Evaluate(Blog.Models.Blog blog);
+    // JObject Enhance(Blog.Models.Blog blog);
 }
-
-
-    private async Task<string> Evaluate(HttpClient httpClient, string endpoint, Blog.Models.Blog blog)
+public class OpenAIService: IOpenAIService 
+{
+    public string  Evaluate(Blog.Models.Blog blog) 
     {
         var formattingFunctionSpecs = new
         {
@@ -152,25 +132,17 @@ public class OpenAIController : ControllerBase
                             "4. Persuasiveness: Does the blog post effectively persuade the reader of the importance of renewable energy for the environment? Are the arguments well-supported? elaborate  in 3 to 4 lines and give a rating out of 10"+
 
                             "Please firmly evaluate the blog post based on the above criteria and provide constructive feedback. Your insights will help me enhance the quality of this content before publishing it. Thank you!",
-        },
+                },
             },
             functions = new dynamic[] { formattingFunctionSpecs },
         };
 
         var payloadJson = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
-        var requestContent = new StringContent(payloadJson, Encoding.UTF8, "application/json");
+        return payloadJson;
 
-        var response = await httpClient.PostAsync(endpoint, requestContent);
-
-        if (response.IsSuccessStatusCode)
-        {
-            string responseContent = await response.Content.ReadAsStringAsync();
-            return responseContent;
-        }
-        else
-        {
-           
-            return $"Error: {response.StatusCode}";
-        }
     }
+}
+
+
+
 }
