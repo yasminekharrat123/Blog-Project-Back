@@ -36,7 +36,7 @@ namespace TP1.Controllers
         [ServiceFilter(typeof(AuthMiddleware))]
         public UserResponseDto GetUserFromJWT()
         {
-            var user = (User)HttpContext.Items["user"];
+            var user = (User)HttpContext.Items["user"]!;
             if (user==null) { throw new BadRequestException("Unexpected?"); }
             return new UserResponseDto(user);
         }
