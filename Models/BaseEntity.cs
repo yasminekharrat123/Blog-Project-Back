@@ -1,4 +1,6 @@
-﻿namespace Blog.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Blog.Models
 {
     public abstract class BaseEntity
     {

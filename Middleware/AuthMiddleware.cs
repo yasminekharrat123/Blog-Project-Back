@@ -4,7 +4,7 @@ using Blog.Context;
 using Blog.ResponseExceptions;
 using Blog.Services;
 
-namespace TP1.Middleware
+namespace Blog.Middleware
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class AuthMiddleware : ActionFilterAttribute
