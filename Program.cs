@@ -15,16 +15,6 @@ builder.Services.AddDbContext<BlogDbContext>((opt) =>
     opt.UseMySql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"), new MySqlServerVersion(new Version(8, 0, 21)));
 });
 
-
-IHostBuilder CreateHostBuilder(string[] args) =>
-Host.CreateDefaultBuilder(args)
-    .ConfigureWebHostDefaults(webBuilder =>
-    {
-        webBuilder.UseStartup<Startup>();
-    });
-
-CreateHostBuilder(args).Build().Run();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
