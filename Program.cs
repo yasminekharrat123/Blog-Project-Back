@@ -1,10 +1,20 @@
 using dotenv.net;
+using Blog.Context;
+using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 DotEnv.Load();
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+// connection to mysql database
+builder.Services.AddDbContext<BlogDbContext>((opt) =>
+{
+    opt.UseMySql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"), new MySqlServerVersion(new Version(8, 0, 21)));
+});
+
 
 var app = builder.Build();
 
