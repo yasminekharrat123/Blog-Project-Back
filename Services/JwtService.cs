@@ -8,7 +8,7 @@ namespace Blog.Services
     public interface IJwtService
     {
         string GenerateToken(ClaimsIdentity claims);
-        public ClaimsPrincipal VerifyToken(string token);
+        public ClaimsPrincipal? VerifyToken(string token);
     }
     public class JwtService : IJwtService
     {
@@ -21,7 +21,7 @@ namespace Blog.Services
 
         public string GenerateToken(ClaimsIdentity claims)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
@@ -34,9 +34,9 @@ namespace Blog.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public ClaimsPrincipal VerifyToken(string token)
+        public ClaimsPrincipal? VerifyToken(string token)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var tokenHandler = new JwtSecurityTokenHandler();
 
             try

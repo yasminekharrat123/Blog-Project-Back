@@ -11,7 +11,7 @@ namespace Blog.Middleware
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var user = (User) context.HttpContext.Items["user"];
+            var user = (User) context.HttpContext.Items["user"]!;
             if( user == null)
             {
                 throw new UnauthorizedException("Invalid User");
