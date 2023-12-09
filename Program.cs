@@ -16,6 +16,15 @@ builder.Services.AddDbContext<BlogDbContext>((opt) =>
 });
 
 
+IHostBuilder CreateHostBuilder(string[] args) =>
+Host.CreateDefaultBuilder(args)
+    .ConfigureWebHostDefaults(webBuilder =>
+    {
+        webBuilder.UseStartup<Startup>();
+    });
+
+CreateHostBuilder(args).Build().Run();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
