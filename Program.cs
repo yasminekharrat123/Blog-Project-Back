@@ -1,17 +1,78 @@
 using dotenv.net;
+using Blog.Context;
+using Microsoft.EntityFrameworkCore;
+using AI;
+using Blog.Services;
+using Blog.Middleware;
+using Blog;
 
-public class Program
+var builder = WebApplication.CreateBuilder(args);
+
+DotEnv.Load();
+// Add services to the container.
+builder.Services.AddRazorPages();
+
+// connection to mysql database
+builder.Services.AddDbContext<BlogDbContext>((opt) =>
 {
-    public static void Main(string[] args)
-    {
-         DotEnv.Load();
-        CreateHostBuilder(args).Build().Run();
-    }
+    opt.UseMySql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"), new MySqlServerVersion(new Version(8, 0, 21)));
+});
 
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-            });
+
+builder.Services.AddHttpClient("OpenAI", client =>
+{
+    client.BaseAddress = new Uri("https://api.openai.com/v1/");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+    string openAiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new Exception("OPENAI_API_KEY environment variable is not set.");
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {openAiApiKey}");
+});
+
+builder.Services.AddTransient<IOpenAIService, OpenAIService>();
+builder.Services.AddTransient<IHashingService, HashingService>();
+builder.Services.AddTransient<IJwtService, JwtService>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddScoped<AuthMiddleware>();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new BadRequestExceptionFilter());
+});
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
 }
+
+app.Use(async (context, next) =>
+{
+    var req = context.Request;
+    var res = context.Response;
+    res.Headers.Add("Access-Control-Allow-Origin", "*");
+    res.Headers.Add(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    if (req.Method == "OPTIONS")
+    {
+       res.Headers.Add("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+       res.StatusCode = 200;
+        await res.WriteAsync("");
+        return;
+    }
+    await next();
+});
+
+//app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+app.UseAuthorization();
+
+app.MapRazorPages();
+app.MapControllers();
+
+app.MapGet("/", () => "Hello Ladies and Gentlemen!");
+
+
+app.Run();
