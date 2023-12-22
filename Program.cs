@@ -5,6 +5,7 @@ using AI;
 using Blog.Services;
 using Blog.Middleware;
 using Blog;
+using Blog.Services.FileService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,13 @@ builder.Services.AddHttpClient("OpenAI", client =>
     string openAiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new Exception("OPENAI_API_KEY environment variable is not set.");
     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {openAiApiKey}");
 });
+
+
+builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IFileValidationService, FileValidationService>();
+
+
+
 
 builder.Services.AddTransient<IOpenAIService, OpenAIService>();
 builder.Services.AddTransient<IHashingService, HashingService>();
