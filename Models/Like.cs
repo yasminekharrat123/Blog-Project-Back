@@ -9,9 +9,6 @@ namespace Blog.Models
 
     public class Like
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
 

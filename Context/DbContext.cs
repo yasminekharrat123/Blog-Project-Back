@@ -49,6 +49,8 @@ namespace Blog.Context
                 .HasOne(l => l.Blog)
                 .WithMany(b => b.Likes)
                 .HasForeignKey(l => l.BlogId);
+            modelBuilder.Entity<Like>()
+        .HasKey(l => new { l.UserId, l.BlogId });
 
             modelBuilder.Entity<Report>()
                 .HasOne(r => r.User)

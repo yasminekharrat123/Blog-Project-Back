@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Models
 {
-    public class Blog
+    public class Blog : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public new int Id { get; set; }
         public string Title { get; set; }
-        public string Body { get; set; }
+        public string? Description { get; set; }
         [DataType(DataType.Date)]
         public DateTime CreationDate { get; set; }
         [DataType(DataType.Date)]
