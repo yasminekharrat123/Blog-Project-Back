@@ -1,3 +1,3 @@
 public class SuggestTitleDto {
-  public String Text { get; set; }
+  public string Text { get; set; }
 }
