@@ -11,7 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 DotEnv.Load();
 // Add services to the container.
-builder.Services.AddRazorPages();
 
 // connection to mysql database
 builder.Services.AddDbContext<BlogDbContext>((opt) =>
@@ -40,6 +39,7 @@ builder.Services.AddTransient<IHashingService, HashingService>();
 builder.Services.AddTransient<IJwtService, JwtService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddScoped<AuthMiddleware>();
+builder.Services.AddScoped<AdminMiddleware>();
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new BadRequestExceptionFilter());
@@ -77,8 +77,12 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 
-app.MapRazorPages();
 app.MapControllers();
+if(app.Environment.IsDevelopment()){
+    app.MapSwagger();
+}
+
+
 
 app.MapGet("/", () => "Hello Ladies and Gentlemen!");
 

@@ -37,19 +37,19 @@ namespace AI
 
         }
         [HttpPost("newTitle")]
-        public async Task<IActionResult> SuggestTitle([FromBody] Blog.Models.Blog blog)
+        public async Task<IActionResult> SuggestTitle([FromBody] SuggestTitleDto dto)
         {
-            return await HandleOpenAIRequest(blog, _openAIService.SuggestNewTitle);
+            return await HandleOpenAIRequest(dto.Text, _openAIService.SuggestNewTitle);
 
         }
 
 
-        private async Task<IActionResult> HandleOpenAIRequest(Blog.Models.Blog blog, Func<Blog.Models.Blog, string> action)
+        private async Task<IActionResult> HandleOpenAIRequest<T>(T body, Func<T, string> action)
         {
             try
             {
                 string endpoint = "chat/completions";
-                string payloadJson = action(blog);
+                string payloadJson = action(body);
                 var requestContent = new StringContent(payloadJson, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(endpoint, requestContent);
 

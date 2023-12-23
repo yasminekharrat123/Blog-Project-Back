@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Blog.Migrations
 {
     [DbContext(typeof(BlogDbContext))]
-    [Migration("20231222174148_FirstMigration")]
-    partial class FirstMigration
+    [Migration("20231223150351_models2")]
+    partial class models2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,12 +28,11 @@ namespace Blog.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("MarkdownPath")
                         .IsRequired()
@@ -91,8 +90,7 @@ namespace Blog.Migrations
 
             modelBuilder.Entity("Blog.Models.Like", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.Property<int>("BlogId")
@@ -101,14 +99,9 @@ namespace Blog.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
+                    b.HasKey("UserId", "BlogId");
 
                     b.HasIndex("BlogId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Likes");
                 });

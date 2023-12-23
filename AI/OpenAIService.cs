@@ -12,7 +12,7 @@ namespace AI
         string Evaluate(Blog.Models.Blog blog);
         string CorrectGrammar(Blog.Models.Blog blog);
         string EnhanceText(Blog.Models.Blog blog);
-        string SuggestNewTitle(Blog.Models.Blog blog);
+        string SuggestNewTitle(String body);
 
 
     }
@@ -125,7 +125,7 @@ namespace AI
                 {
                     role = "user",
                     content =
-                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} \n , {blog.Body} \n"+
+                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} \n"+
                             "I'm seeking an evaluation of the blog post's overall quality, coherence, and persuasiveness. Specifically, I'd like feedback on the following aspects:"+
 
                             "1. Clarity and Structure: Does the blog post have a clear and logical structure? Are the main points well-organized and easy to follow? elaborate in 3 to 4 lines and give a rating out of 10"+
@@ -187,7 +187,7 @@ namespace AI
                 {
                     role = "user",
                     content =
-                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} \n , {blog.Body} \n Please correct any grammar or phrasing mistakes in the title and body of this blog. \n"
+                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} \n \n Please correct any grammar or phrasing mistakes in the title and body of this blog. \n"
 
                 },
                 },
@@ -239,7 +239,7 @@ namespace AI
                 {
                     role = "user",
                     content =
-                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} \n , {blog.Body} \n As a literary expert, please enhance the writing quality of this blog. \n Focus on improving the flow, elegance, and overall literary quality of both the title and the body."
+                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} \n As a literary expert, please enhance the writing quality of this blog. \n Focus on improving the flow, elegance, and overall literary quality of both the title and the body."
 
                 },
                 },
@@ -250,7 +250,7 @@ namespace AI
             return payloadJson;
 
         }
-        public string SuggestNewTitle(Blog.Models.Blog blog)
+        public string SuggestNewTitle(String body)
         {
             var formattingFunctionSpecs = new
             {
@@ -286,7 +286,7 @@ namespace AI
                 {
                     role = "user",
                     content =
-                            $"Pretend you're a literary expert. Consider this blog body : {blog.Body} \n Please suggest a relevant title for this blog body  \n"
+                            $"Pretend you're a literary expert. Consider this blog body : {body} \n Please suggest a relevant title for this blog body  \n"
 
                 },
                 },
