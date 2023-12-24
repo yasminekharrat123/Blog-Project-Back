@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Blog.Models
 {
 
-    public class Like
+    public class Like : BaseEntity
     {
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
