@@ -16,14 +16,12 @@ public class LikeController : Controller
     }
 
     [HttpPost("like")]
-    [ServiceFilter(typeof(AuthMiddleware))]
     public void Like(Blog.Models.Blog blog, User user)
     {
         _likeService.Like(blog,user);
     }
 
     [HttpPost("dislike")]
-    [ServiceFilter(typeof(AuthMiddleware))]
     public void Dislike(Blog.Models.Blog blog, User user)
     {
         _likeService.Dislike(blog,user);
