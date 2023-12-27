@@ -52,6 +52,17 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
 }
 
+builder.Services.AddCors(options =>
+{
+	options.AddDefaultPolicy(policy =>
+    {
+    	policy.AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowAnyOrigin();
+    });
+});
+
 app.Use(async (context, next) =>
 {
     var req = context.Request;
