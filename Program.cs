@@ -44,14 +44,6 @@ builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new BadRequestExceptionFilter());
 });
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-}
-
 builder.Services.AddCors(options =>
 {
 	options.AddDefaultPolicy(policy =>
@@ -63,6 +55,15 @@ builder.Services.AddCors(options =>
     });
 });
 
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+}
+
+app.UseCors();
 app.Use(async (context, next) =>
 {
     var req = context.Request;
