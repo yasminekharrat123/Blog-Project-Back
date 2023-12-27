@@ -6,6 +6,7 @@ using Blog.Services;
 using Blog.Middleware;
 using Blog;
 using Blog.Services.FileService;
+using Blog.Blog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,9 @@ builder.Services.AddTransient<IJwtService, JwtService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddScoped<AuthMiddleware>();
 builder.Services.AddScoped<AdminMiddleware>();
+
+builder.Services.AddScoped<IBlogService, BlogService>();
+
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new BadRequestExceptionFilter());
