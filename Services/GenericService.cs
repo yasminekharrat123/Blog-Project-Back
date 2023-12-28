@@ -15,7 +15,7 @@ namespace Blog.Services
 
     }
     public class GenericService<T>: IGenericService<T> where T : BaseEntity
-    {
+    {   
         protected readonly BlogDbContext _context;
         protected readonly DbSet<T> _repository;
 
