@@ -8,17 +8,21 @@ using Blog.Services.FileService;
 using Blog.Services.Comments;
 
 using Blog.Models;
+using LikeService;
 
 namespace Blog.Blog
 {
     public class BlogService : GenericService<BlogModel>, IBlogService
     {
-        private readonly FileService _fileService;
-        private readonly CommentService _commentService; 
-        public BlogService(BlogDbContext context , FileService fileService , CommentService  commentService ) : base(context)
+        private readonly IFileService _fileService;
+        private readonly ICommentService _commentService;
+        private readonly ILikeService _likeService;
+
+        public BlogService(BlogDbContext context , FileService fileService , CommentService  commentService , ILikeService likeService ) : base(context)
         {
             _fileService = fileService;
             _commentService = commentService; 
+            _likeService = likeService;
         }
         public List<MinimalBlogResponseDto> GetBlogs(PaginationParams pagination = null, BlogFilterParams filter = null)
         {
@@ -64,7 +68,7 @@ namespace Blog.Blog
                 Title = blog.Title,
                 Description = blog.Description,
                 MarkdownPath = blog.MarkdownPath,
-                LikeCount = blog.Likes.Count(),
+                LikeCount = GetLikeCountByBlog(blog),
                 CommentCount = GetCommentCountByBlog(blog)
             })
             .ToList();
@@ -133,5 +137,10 @@ namespace Blog.Blog
         {
             return _commentService.GetCommentsByBlog(page , limit , blog); 
         }
+        public int GetLikeCountByBlog(BlogModel blog)
+        {
+            return _likeService.GetLikeCountByBlog(blog); 
+        }
+
     }
 }

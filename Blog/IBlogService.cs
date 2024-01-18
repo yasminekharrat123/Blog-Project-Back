@@ -12,7 +12,7 @@ namespace Blog.Blog
         public BlogModel DeleteBlog(int blogId);
         public int GetCommentCountByBlog(BlogModel blog);
         public IEnumerable<Comment> GetCommentsByBlog(int page, int limit, BlogModel blog);
-
+        public int GetLikeCountByBlog(BlogModel blog);
 
     }
 }
