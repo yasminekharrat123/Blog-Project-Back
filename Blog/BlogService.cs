@@ -5,16 +5,24 @@ using Blog.Services;
 using Blog.Blog.Models;
 using Blog.Dto.BlogDto;
 using Blog.Services.FileService;
+using Blog.Services.Comments;
+
 using Blog.Models;
+using LikeService;
 
 namespace Blog.Blog
 {
     public class BlogService : GenericService<BlogModel>, IBlogService
     {
-        private readonly FileService _fileService;
-        public BlogService(BlogDbContext context , FileService fileService) : base(context)
+        private readonly IFileService _fileService;
+        private readonly ICommentService _commentService;
+        private readonly ILikeService _likeService;
+
+        public BlogService(BlogDbContext context , FileService fileService , CommentService  commentService , ILikeService likeService ) : base(context)
         {
-            _fileService = fileService; 
+            _fileService = fileService;
+            _commentService = commentService; 
+            _likeService = likeService;
         }
         public List<MinimalBlogResponseDto> GetBlogs(PaginationParams pagination = null, BlogFilterParams filter = null)
         {
@@ -59,9 +67,9 @@ namespace Blog.Blog
                 BlogId = blog.Id,
                 Title = blog.Title,
                 Description = blog.Description,
-                MarkdownPath = blog.MarkdownPath  ,
-                LikeCount = blog.Likes.Count(),
-                CommentCount = blog.Comments.Count()
+                MarkdownPath = blog.MarkdownPath,
+                LikeCount = GetLikeCountByBlog(blog),
+                CommentCount = GetCommentCountByBlog(blog)
             })
             .ToList();
 
@@ -78,10 +86,22 @@ namespace Blog.Blog
                 existingBlog.Description = updateDto.Description ?? existingBlog.Description;
                 if (updateDto.UploadedMarkdownFile != null)
                 {
+                    var prevMarkdownPath = existingBlog.MarkdownPath; 
                     existingBlog.MarkdownPath = await _fileService.UploadMarkdownFile(updateDto.UploadedMarkdownFile);
+                    if (existingBlog.MarkdownPath !=null)
+                    {
+                        if (prevMarkdownPath!= null )
+                        {
+                            await _fileService.DeleteFile(prevMarkdownPath);
+                        }
+                    }else
+                    {
+                        existingBlog.MarkdownPath = prevMarkdownPath; 
+                    }
+
                 }
 
-               return  this.Update(existingBlog);
+                return  this.Update(existingBlog);
             }
 
 
@@ -108,5 +128,19 @@ namespace Blog.Blog
         {
             return this.Delete(blogId); 
         }
+
+        public int GetCommentCountByBlog(BlogModel blog)
+        {
+            return _commentService.GetCommentCountByBlog(blog); 
+        }
+        public IEnumerable<Comment> GetCommentsByBlog(int page, int limit, BlogModel blog)
+        {
+            return _commentService.GetCommentsByBlog(page , limit , blog); 
+        }
+        public int GetLikeCountByBlog(BlogModel blog)
+        {
+            return _likeService.GetLikeCountByBlog(blog); 
+        }
+
     }
 }

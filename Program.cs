@@ -6,6 +6,9 @@ using Blog.Services;
 using Blog.Middleware;
 using Blog;
 using Blog.Services.FileService;
+using Blog.Services.Comments;
+using LikeService;
+
 using Blog.Blog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +44,8 @@ builder.Services.AddTransient<IJwtService, JwtService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddScoped<AuthMiddleware>();
 builder.Services.AddScoped<AdminMiddleware>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<ILikeService, LikeService.LikeService>();
 
 builder.Services.AddScoped<IBlogService, BlogService>();
 
