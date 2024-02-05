@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Models
@@ -20,6 +21,7 @@ namespace Blog.Models
         public string MarkdownPath { get; set; }
 
         public int UserId { get; set; }
+        [JsonIgnore]
         public User User { get; set; }
 
         public ICollection<Like> Likes { get; set; }

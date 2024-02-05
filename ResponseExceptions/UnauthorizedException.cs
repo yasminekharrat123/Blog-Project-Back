@@ -2,6 +2,6 @@
 {
     public class UnauthorizedException : BaseResponseException
     {
-        public UnauthorizedException(string message) : base(message, Blog.ResponseExceptions.StatusCodes.UNAUTHORIZED) { }
+        public UnauthorizedException(string message) : base(message, ResponseExceptions.StatusCodes.UNAUTHORIZED) { }
     }
 }

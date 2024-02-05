@@ -9,6 +9,8 @@ using Blog.Services.Comments;
 
 using Blog.Models;
 using LikeService;
+using Blog.ReponseExceptions;
+using static Dapper.SqlMapper;
 
 namespace Blog.Blog
 {
@@ -18,7 +20,7 @@ namespace Blog.Blog
         private readonly ICommentService _commentService;
         private readonly ILikeService _likeService;
 
-        public BlogService(BlogDbContext context , FileService fileService , CommentService  commentService , ILikeService likeService ) : base(context)
+        public BlogService(BlogDbContext context , IFileService fileService , ICommentService  commentService , ILikeService likeService ) : base(context)
         {
             _fileService = fileService;
             _commentService = commentService; 
@@ -62,22 +64,21 @@ namespace Blog.Blog
             }
 
             var data = query
-            .Select(blog => new MinimalBlogResponseDto
-            {
-                BlogId = blog.Id,
-                Title = blog.Title,
-                Description = blog.Description,
-                MarkdownPath = blog.MarkdownPath,
-                LikeCount = GetLikeCountByBlog(blog),
-                CommentCount = GetCommentCountByBlog(blog)
-            })
             .ToList();
 
+            List<MinimalBlogResponseDto> minimalData = data.Select(blog =>
+            {
+                var minBlog = new MinimalBlogResponseDto(blog);
+                minBlog.CommentCount = GetCommentCountByBlog(blog);
+                minBlog.LikeCount = GetLikeCountByBlog(blog);
+                return minBlog;
 
-            return data ; 
+            }).ToList(); 
+
+            return minimalData ; 
         }
 
-        public async Task<BlogModel> UpdateBlog(UpdateBlogDto updateDto)
+        public async Task<MinimalBlogResponseDto> UpdateBlog(UpdateBlogDto updateDto)
         {
             var existingBlog =  this.FindById(updateDto.BlogId);
             if (existingBlog != null)
@@ -100,8 +101,8 @@ namespace Blog.Blog
                     }
 
                 }
-
-                return  this.Update(existingBlog);
+                BlogModel blog = this.Update(existingBlog); 
+                return  new MinimalBlogResponseDto(blog);
             }
 
 
@@ -110,7 +111,7 @@ namespace Blog.Blog
 
         }
 
-        public async Task<BlogModel> CreateBlog(CreateBlogDto createDto)
+        public async Task<MinimalBlogResponseDto> CreateBlog(CreateBlogDto createDto)
         {
             var newBlog = new BlogModel();
             newBlog.Title = createDto.Title;
@@ -120,13 +121,27 @@ namespace Blog.Blog
             /// Waiting File service
             newBlog.MarkdownPath = await _fileService.UploadMarkdownFile(createDto.UploadedMarkdownFile);
             newBlog.CreationDate = DateTime.UtcNow;
-           return  this.Create(newBlog);
+            return new MinimalBlogResponseDto(Create(newBlog));
 
         }
 
-        public BlogModel DeleteBlog(int blogId)
+        public async Task<MinimalBlogResponseDto> DeleteBlog(int blogId)
         {
-            return this.Delete(blogId); 
+
+            BlogModel blog = this.FindById(blogId);
+            if (blog == null)
+            {
+                throw new NotFoundException("Blog Not Found");
+            }else
+            {
+
+            }
+            await _fileService.DeleteFile(blog.MarkdownPath);
+            return new MinimalBlogResponseDto(this.Delete(blogId)); 
+        }
+        public MinimalBlogResponseDto GetBlogById(int blogId)
+        {
+            return new MinimalBlogResponseDto(FindById(blogId)); 
         }
 
         public int GetCommentCountByBlog(BlogModel blog)

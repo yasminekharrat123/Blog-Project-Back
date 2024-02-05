@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Blog.Models;
+using BlogModel = Blog.Models.Blog;
+
 
 namespace Blog.Context
 {
@@ -11,14 +13,14 @@ namespace Blog.Context
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Blog.Models.Blog> Blogs { get; set; }
+        public DbSet<BlogModel> Blogs { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<Like>  Likes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Blog.Models.Blog>()
+            modelBuilder.Entity<BlogModel>()
                 .HasOne(b => b.User)
                 .WithMany(u => u.Blogs)
                 .HasForeignKey(b => b.UserId);
