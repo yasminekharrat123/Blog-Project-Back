@@ -4,11 +4,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blog.Services.FileService;
 using Blog.Dto;
+using Blog.Middleware;
 
 namespace Blog.Controllers
 {
     [ApiController]
     [Route("files")]
+    [ServiceFilter(typeof(AuthMiddleware))]
+
+
     public class FileController : ControllerBase
     {
         private readonly IFileService _fileService;
@@ -16,13 +20,6 @@ namespace Blog.Controllers
         public FileController(IFileService fileService)
         {
             _fileService = fileService;
-        }
-
-        [HttpPost("markdown")]
-        public async Task<ActionResult<string>> UploadMarkdownFile([FromForm] IFormFile markdownFile)
-        {
-            var result = await _fileService.UploadMarkdownFile(markdownFile);
-            return Ok(result);
         }
 
         [HttpPost("images")]
