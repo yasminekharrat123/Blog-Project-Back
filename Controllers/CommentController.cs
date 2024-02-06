@@ -23,9 +23,19 @@ namespace Blog.Controllers
         public IActionResult CreateComment([FromBody] CreateCommentDto commentDto)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);
-            var comment = _commentService.CreateComment(commentDto.UserId, commentDto.BlogId, commentDto.ParentCommentId, commentDto.Content);
+
+            var comment = _commentService.CreateComment(commentDto.UserId, commentDto.BlogId, null, commentDto.Content);
             return Ok(comment);
             
+        }
+
+        [HttpPost("reply")]
+        public IActionResult ReplyToComment([FromBody] CreateReplyDto commentDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var comment = _commentService.CreateComment(commentDto.UserId, null, commentDto.ParentCommentId, commentDto.Content);
+            return Ok(comment);
+
         }
 
 

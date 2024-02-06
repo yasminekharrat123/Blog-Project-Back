@@ -11,14 +11,14 @@ namespace Blog.Context
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Blog.Models.Blog> Blogs { get; set; }
+        public DbSet<Models.Blog> Blogs { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<Like>  Likes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Blog.Models.Blog>()
+            modelBuilder.Entity<Models.Blog>()
                 .HasOne(b => b.User)
                 .WithMany(u => u.Blogs)
                 .HasForeignKey(b => b.UserId);
