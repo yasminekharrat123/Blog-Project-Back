@@ -27,6 +27,8 @@ namespace Blog.Models
         public int UserId { get; set; }
         public User User { get; set; }
         public int? BlogId { get; set; }
+        [JsonIgnore]
+
         public Blog? Blog { get; set; }
 
     }

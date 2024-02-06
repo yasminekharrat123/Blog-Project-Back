@@ -68,9 +68,14 @@ namespace Blog.Blog
 
             List<MinimalBlogResponseDto> minimalData = data.Select(blog =>
             {
+                blog.Comments = GetCommentsByBlog(-1, -1, blog).ToList()
+                     ; 
+
+                
                 var minBlog = new MinimalBlogResponseDto(blog);
                 minBlog.CommentCount = GetCommentCountByBlog(blog);
                 minBlog.LikeCount = GetLikeCountByBlog(blog);
+                
                 return minBlog;
 
             }).ToList(); 
@@ -141,14 +146,18 @@ namespace Blog.Blog
         }
         public MinimalBlogResponseDto GetBlogById(int blogId)
         {
-            return new MinimalBlogResponseDto(FindById(blogId)); 
+            var blog = FindById(blogId);
+            blog.Comments = GetCommentsByBlog(-1, -1, blog).ToList(); 
+            var minBlog =  new MinimalBlogResponseDto(blog); 
+            minBlog.CommentCount = GetCommentCountByBlog(blog);
+            return minBlog; 
         }
 
         public int GetCommentCountByBlog(BlogModel blog)
         {
             return _commentService.GetCommentCountByBlog(blog); 
         }
-        public IEnumerable<Comment> GetCommentsByBlog(int page, int limit, BlogModel blog)
+        public IEnumerable<Comment> GetCommentsByBlog(int page , int limit , BlogModel blog)
         {
             return _commentService.GetCommentsByBlog(page , limit , blog); 
         }
