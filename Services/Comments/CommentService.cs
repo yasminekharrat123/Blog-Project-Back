@@ -48,7 +48,7 @@ namespace Blog.Services.Comments
 
         public int GetCommentCountByBlog(Models.Blog blog)
         {
-            return _context.Comments.Count(c => c.Id == blog.Id);
+            return _context.Comments.Count(c => c.BlogId == blog.Id );
         }
 
 
@@ -61,12 +61,15 @@ namespace Blog.Services.Comments
         
         public IEnumerable<Comment> GetCommentsByBlog(int page, int limit, Models.Blog blog)
         {
-            return _context.Comments
-                            .Where(c => c.BlogId == blog.Id)
-                            .OrderBy(c => c.Date) 
-                            .Skip((page - 1) * limit)
-                            .Take(limit)
-                            .ToList();
+            var query = _context.Comments.AsQueryable();
+            query = query.Where(c => c.BlogId == blog.Id && c.ParentCommentId == null)
+                            .OrderBy(c => c.Date); 
+            if (page!= -1 && limit != -1)
+            {
+                query = query.Skip((page - 1) * limit)
+                            .Take(limit); 
+            }
+            return query.ToList();
         }
 
 
@@ -104,14 +107,19 @@ namespace Blog.Services.Comments
                 }
             }
             Models.Blog? blog = null;
-            if(blogId != null) { 
-                blog = _context.Blogs.FirstOrDefault(c => c.Id == blogId);
-                if(blog == null)
-                {
-                    throw new ResponseExceptions.BaseResponseException($"Blog with ID {blogId} does not exist.", ResponseExceptions.StatusCodes.NOT_FOUND);
-                }
-            }
+             
+            if(blogId == null) { 
+                blog = _context.Blogs.FirstOrDefault(c => c.Id == parentComment.BlogId);
+               
 
+            }else
+            {
+                blog = _context.Blogs.FirstOrDefault(c => c.Id == blogId);
+            }
+            if (blog == null)
+            {
+                throw new ResponseExceptions.BaseResponseException($"Blog with ID {blogId} does not exist.", ResponseExceptions.StatusCodes.NOT_FOUND);
+            }
             var comment = new Comment { User = user, Blog = blog, ParentComment = parentComment ,   Content = content };
             
             _context.Comments.Add(comment);

@@ -56,11 +56,11 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new BadRequestExceptionFilter());
 });
 builder.Services.AddControllers()
-    .AddJsonOptions(options =>
+ /*   .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-    });
-
+    })*/
+ ;
 builder.Services.AddCors(options =>
 {
 	options.AddDefaultPolicy(policy =>
