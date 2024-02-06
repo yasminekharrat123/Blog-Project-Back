@@ -9,10 +9,11 @@ namespace LikeService
     public interface ILikeService
     {
         public void Like(Blog.Models.Blog blog, User user);
+        public Boolean isLiked(int blogId, User user); 
         public void Dislike(Blog.Models.Blog blog, User user);
         public Like GetLikeById(int id);
         public int GetLikeCountByBlog(Blog.Models.Blog blog);
-        public IEnumerable<Like> GetLikesByBlog(Blog.Models.Blog blog, int page);
+        public IEnumerable<Like> GetLikesByBlog(Blog.Models.Blog blog, int page = -1 ,  int limit=-1);
 
     }
 
@@ -38,6 +39,13 @@ namespace LikeService
 
         }
 
+        public Boolean isLiked(int blogId , User user)
+        {
+            var like = _repository.FirstOrDefault(l => (l.BlogId == blogId && l.UserId == user.Id));
+            if (like == null) return false;
+            return true; 
+
+        }
         public void Dislike(Blog.Models.Blog blog, User user)
         {
             var like = _repository.FirstOrDefault(l => l.BlogId == blog.Id && l.UserId == user.Id);               
@@ -58,12 +66,18 @@ namespace LikeService
         }
 
         //using pagination
-        //10 likes per page
-        public IEnumerable<Like> GetLikesByBlog(Blog.Models.Blog blog , int page)
+        //limit likes per page
+        public IEnumerable<Like> GetLikesByBlog(Blog.Models.Blog blog , int page = -1 , int limit = -1)
         {
-            return _repository.Where(l => l.BlogId == blog.Id)
-                .Skip((page - 1) * 10)
-                .Take(10);
+            var query = _repository.AsQueryable();
+            query = query.Where(l => l.BlogId == blog.Id); 
+            if (page!=-1 && limit != -1)
+            {
+                query = query.Skip((page - 1) * limit)
+                .Take(limit);
+            }
+
+            return query.ToList(); 
         }
     }   
     

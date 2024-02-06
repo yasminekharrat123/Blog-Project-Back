@@ -120,7 +120,7 @@ namespace Blog.Services.Comments
             {
                 throw new ResponseExceptions.BaseResponseException($"Blog with ID {blogId} does not exist.", ResponseExceptions.StatusCodes.NOT_FOUND);
             }
-            var comment = new Comment { User = user, Blog = blog, ParentComment = parentComment ,   Content = content };
+            var comment = new Comment { User = user, Blog = blog, ParentComment = parentComment, Content = content, Date = DateTime.Now };
             
             _context.Comments.Add(comment);
             _context.SaveChanges();

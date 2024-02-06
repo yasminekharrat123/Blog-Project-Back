@@ -11,7 +11,6 @@ namespace Blog.Dto.BlogDto
         public string Title { get; set; }
         public string? Description { get; set; } = null;
         public string MarkdownPath { get; set; }
-        public ICollection<Like> Likes { get; set; }
         public int LikeCount { get; set; }
         public int CommentCount { get; set; }
 
@@ -31,18 +30,7 @@ namespace Blog.Dto.BlogDto
             Description = blog.Description;
             MarkdownPath = blog.MarkdownPath;
             PublisherId = blog.UserId; 
-          
-               Likes = blog.Likes; 
-            
-            
-                Comments = blog.Comments.Select(c => new CommentResponseDto
-                {
-                    Content = c.Content,
-                    Id = c.Id,
-                    UserId = c.UserId
-
-
-                }).ToList();
+                Comments = blog.Comments.Select(c => new CommentResponseDto(c)).ToList();
           
 
         }

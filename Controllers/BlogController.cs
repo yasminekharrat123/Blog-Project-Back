@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySqlX.XDevAPI.Common;
 using Blog.ReponseExceptions;
 using Blog.Blog.Models;
+using LikeService;
 
 namespace Blog.Controllers
 {
@@ -16,47 +17,50 @@ namespace Blog.Controllers
 
     public class BlogController : Controller
     {
-        private readonly IBlogService _blogService; 
-        public BlogController(IBlogService blogService)
+        private readonly IBlogService _blogService;
+        private readonly ILikeService _likeService;
+        public BlogController(IBlogService blogService, ILikeService likeService)
         {
             this._blogService = blogService;
+            this._likeService = likeService;
         }
 
 
         [HttpPost]
         [ServiceFilter(typeof(AuthMiddleware))]
-        public  async Task<IActionResult> Create([FromForm] CreateBlogRequestDto createBlogRequestDto)
+        public async Task<IActionResult> Create([FromForm] CreateBlogRequestDto createBlogRequestDto)
         {
             var user = (User)HttpContext.Items["user"]!;
             if (user == null) { throw new BadRequestException("Unexpected?"); }
 
-            CreateBlogDto createBlogDto; 
+            CreateBlogDto createBlogDto;
             try
             {
-                 createBlogDto = new CreateBlogDto { Title = createBlogRequestDto.Title, Description = createBlogRequestDto.Description, UploadedMarkdownFile = createBlogRequestDto.UploadedMarkdownFile, UserId = user.Id };
-            }catch (Exception ex)
+                createBlogDto = new CreateBlogDto { Title = createBlogRequestDto.Title, Description = createBlogRequestDto.Description, UploadedMarkdownFile = createBlogRequestDto.UploadedMarkdownFile, UserId = user.Id };
+            }
+            catch (Exception ex)
             {
-            throw new    BadRequestException("Missing or invalid data");
+                throw new BadRequestException("Missing or invalid data");
             }
 
-            MinimalBlogResponseDto blogResponse =  await _blogService.CreateBlog(createBlogDto);
+            MinimalBlogResponseDto blogResponse = await _blogService.CreateBlog(createBlogDto);
             if (blogResponse == null)
             {
-                throw new Exception("Couldn't create blog"); 
+                throw new Exception("Couldn't create blog");
             }
 
-            return Ok(blogResponse); 
+            return Ok(blogResponse);
         }
 
 
         [HttpGet("{blogId}")]
-        public  MinimalBlogResponseDto GetBlogById([FromRoute] int blogId)
+        public MinimalBlogResponseDto GetBlogById([FromRoute] int blogId)
         {
 
 
 
-            MinimalBlogResponseDto blog = _blogService.GetBlogById(blogId); 
-            
+            MinimalBlogResponseDto blog = _blogService.GetBlogById(blogId);
+
 
             return blog;
         }
@@ -71,7 +75,7 @@ namespace Blog.Controllers
 
 
 
-            List<MinimalBlogResponseDto> blogs = _blogService.GetBlogs(pagination,filter);
+            List<MinimalBlogResponseDto> blogs = _blogService.GetBlogs(pagination, filter);
 
 
             return blogs;
@@ -94,19 +98,19 @@ namespace Blog.Controllers
         }
         [HttpPatch("{blogId}")]
         [ServiceFilter(typeof(AuthMiddleware))]
-        public async Task<IActionResult> UpdateBlog([FromRoute] int blogId , [FromForm] UpdateBlogDto updateBlogDto)
+        public async Task<IActionResult> UpdateBlog([FromRoute] int blogId, [FromForm] UpdateBlogDto updateBlogDto)
         {
             var user = (User)HttpContext.Items["user"]!;
             if (user == null) { throw new BadRequestException("Unexpected?"); }
             updateBlogDto.BlogId = blogId;
-            BlogModel blog = _blogService.FindById(updateBlogDto.BlogId); 
+            BlogModel blog = _blogService.FindById(updateBlogDto.BlogId);
 
 
-            if(blog == null)
+            if (blog == null)
             {
-                throw new NotFoundException("No Blog with such Id"); 
+                throw new NotFoundException("No Blog with such Id");
             }
-            if(blog.UserId != user.Id)
+            if (blog.UserId != user.Id)
             {
                 throw new UnauthorizedException("You are not the owner of this blog");
             }
@@ -116,6 +120,37 @@ namespace Blog.Controllers
 
 
             return Ok(updatedBlog);
+        }
+
+        [HttpPost("{blogId}/like")]
+        [ServiceFilter(typeof(AuthMiddleware))]
+        public IActionResult Like([FromRoute] int blogId)
+        {
+            var user = (User)HttpContext.Items["user"]!;
+            if (user == null) { throw new BadRequestException("Unexpected?"); }
+            if (_likeService.isLiked(blogId, user))
+            {
+                _likeService.Dislike(new BlogModel { Id = blogId }, user);
+                return Ok(new { Message = "Blog Disliked", BlogId = blogId, UserId = user.Id });
+            }
+            else
+            {
+                _likeService.Like(new BlogModel { Id = blogId }, user);
+                return Ok(new { Message = "Blog Liked", BlogId = blogId, UserId = user.Id });
+            }
+
+
+
+        }
+        [HttpGet("{blogId}/like")]
+
+        public IActionResult getBlogLikes([FromRoute] int blogId, [FromQuery] int page=-1, [FromQuery] int limit=-1)
+        {
+          
+            IEnumerable<Like> likes = _likeService.GetLikesByBlog(new BlogModel { Id = blogId }, page, limit);
+            ICollection<int> userIds = likes.Select(l => l.UserId).ToList();
+            return Ok(new { blogId = blogId, likesUserIds = userIds   });
+
         }
     }
 }
