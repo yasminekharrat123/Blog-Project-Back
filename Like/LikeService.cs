@@ -40,11 +40,9 @@ namespace LikeService
 
         public void Dislike(Blog.Models.Blog blog, User user)
         {
-            var like = _repository.FirstOrDefault(l => l.BlogId == blog.Id && l.UserId == user.Id);
-            if(like != null)
-               
+            var like = _repository.FirstOrDefault(l => l.BlogId == blog.Id && l.UserId == user.Id);               
             if (like == null)
-                return;
+                throw new BadRequestException("User didn't like this blog");
             _repository.Remove(like);
             _context.SaveChanges();
         }
