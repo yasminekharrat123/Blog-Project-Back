@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Models
@@ -20,9 +21,13 @@ namespace Blog.Models
         [DataType(DataType.Date)]
         public DateTime? LastLoginDate { get; set; }
 
+        [JsonIgnore]
         public ICollection<Blog> Blogs { get; set; }
+        [JsonIgnore]
         public ICollection<Like> Likes { get; set; }
+        [JsonIgnore]
         public ICollection<Report> Reports { get; set; }
+        [JsonIgnore]
         public ICollection<Comment> Comments { get; set; }
     }
 

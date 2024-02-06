@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Models
@@ -23,9 +24,11 @@ namespace Blog.Models
         public int UserId { get; set; }
         [JsonIgnore]
         public User User { get; set; }
-
+        [JsonIgnore]
         public ICollection<Like> Likes { get; set; }
+        [JsonIgnore]
         public ICollection<Report> Reports { get; set; }
+        
         public ICollection<Comment> Comments { get; set; }
 
     }

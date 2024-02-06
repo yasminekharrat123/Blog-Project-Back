@@ -13,14 +13,18 @@ namespace Blog.Context
         }
 
         public DbSet<User> Users { get; set; }
+
         public DbSet<BlogModel> Blogs { get; set; }
+       
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<Like>  Likes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             modelBuilder.Entity<BlogModel>()
+
                 .HasOne(b => b.User)
                 .WithMany(u => u.Blogs)
                 .HasForeignKey(b => b.UserId);
@@ -30,7 +34,8 @@ namespace Blog.Context
         .HasOne(c => c.ParentComment)
         .WithMany(c => c.Replies)
         .HasForeignKey(c => c.ParentCommentId)
-        .IsRequired(false);
+        .IsRequired(false)
+        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.User)

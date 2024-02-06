@@ -3,6 +3,7 @@ using Blog.Context;
 using Blog.ResponseExceptions;
 using System;
 using MySqlX.XDevAPI.CRUD;
+using System.ComponentModel.Design;
 
 namespace Blog.Services.Comments
 {
@@ -17,7 +18,7 @@ namespace Blog.Services.Comments
 
 
 
-        private Comment findComment(int commentId)
+        public Comment FindComment(int commentId)
         {
             var comment = _context.Comments.FirstOrDefault(c => c.Id == commentId);
             if (comment == null)
@@ -53,7 +54,7 @@ namespace Blog.Services.Comments
 
         public int GetRepliesCountByComment(int commentId)
         {
-            Comment comment = findComment(commentId);
+            Comment comment = FindComment(commentId);
             return _context.Comments.Count(c => c.ParentCommentId == commentId);
         }
 
@@ -71,9 +72,9 @@ namespace Blog.Services.Comments
 
 
 
-        public IEnumerable<Comment> GetRepliesByComment(int commentId, int recursionDepth, int page, int limit)
+        public IEnumerable<Comment> GetRepliesByComment(int commentId, int recursionDepth , int page , int limit)
         {
-            var comment = findComment(commentId);
+            var comment = FindComment(commentId);
 
             // Apply pagination to the first level of replies
             var paginatedReplies = _context.Comments
@@ -91,25 +92,52 @@ namespace Blog.Services.Comments
             return paginatedReplies;
         }
 
-        public Comment CreateComment(User user, Models.Blog blog, string content)
+        public Comment CreateComment(User user, int? blogId, int? parentCommentId, string content)
         {
-            var comment = new Comment { User = user, Blog = blog, Content = content };
+            Comment? parentComment = null;
+            if(parentCommentId != null)
+            {
+                parentComment = _context.Comments.FirstOrDefault(c => c.Id == parentCommentId);
+                if (parentComment == null)
+                {
+                    throw new ResponseExceptions.BaseResponseException($"Comment with ID {parentCommentId} does not exist.", ResponseExceptions.StatusCodes.NOT_FOUND);
+                }
+            }
+            Models.Blog? blog = null;
+            if(blogId != null) { 
+                blog = _context.Blogs.FirstOrDefault(c => c.Id == blogId);
+                if(blog == null)
+                {
+                    throw new ResponseExceptions.BaseResponseException($"Blog with ID {blogId} does not exist.", ResponseExceptions.StatusCodes.NOT_FOUND);
+                }
+            }
+
+            var comment = new Comment { User = user, Blog = blog, ParentComment = parentComment ,   Content = content };
+            
             _context.Comments.Add(comment);
             _context.SaveChanges();
             return comment;
         }
 
-        public Comment UpdateComment(int commentId, string updatedContent)
+        public Comment UpdateComment(User user, int commentId, string updatedContent)
         {
-            var comment = findComment(commentId);
+            var comment = FindComment(commentId);
+            if(comment.User.Id != user.Id)
+            {
+                throw new ResponseExceptions.BaseResponseException($"Comment does not belong to user.", ResponseExceptions.StatusCodes.FORBIDDEN);
+            } 
             comment.Content = updatedContent;
             _context.SaveChanges();
             return comment;
         }
 
-        public void DeleteComment(int commentId)
+        public void DeleteComment(User user, int commentId)
         {
-            var comment = findComment(commentId);
+            var comment = FindComment(commentId);
+            if (comment.User.Id != user.Id)
+            {
+                throw new ResponseExceptions.BaseResponseException($"Comment does not belong to user.", ResponseExceptions.StatusCodes.FORBIDDEN);
+            }
             _context.Comments.Remove(comment);
             _context.SaveChanges();
             
@@ -117,7 +145,7 @@ namespace Blog.Services.Comments
 
         public Comment CreateReply(int commentId, User user, string content)
         {
-            var parentComment = findComment(commentId);
+            var parentComment = FindComment(commentId);
             var reply = new Comment { User = user, ParentComment = parentComment, Content = content };
             _context.Comments.Add(reply);
             _context.SaveChanges();

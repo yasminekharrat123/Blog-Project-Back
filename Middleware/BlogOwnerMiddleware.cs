@@ -14,11 +14,13 @@ namespace Blog.Middleware
     {
         // TO be replaced with
         // private readonly IBlogService _blogService;
+
         private readonly IGenericService<BlogModel> _GenericService;
 
 
         //param to be replaced with IBlogService blogService
         public BlogOwnerMiddleware(IGenericService<BlogModel> blogService)
+
         {
             // _blogService = blogService;
             _GenericService = blogService;
