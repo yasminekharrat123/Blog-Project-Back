@@ -9,7 +9,7 @@ using System.Text.Json.Serialization;
 namespace Blog.Models
 {
 
-    public class Like
+    public class Like : BaseEntity
     {
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
