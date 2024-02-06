@@ -50,14 +50,16 @@ namespace Blog.Services
         {
             var created = _repository.Add(creationDto);
             _context.SaveChanges();
-            return _repository.FirstOrDefault(el => el.Id == creationDto.Id);
+            //  return _repository.FirstOrDefault(el => el.Id == created.Id);
+            return created.Entity; 
         }
 
         public T? Update(T updateDto)
         {
             var updated = _repository.Update(updateDto);
             _context.SaveChanges();
-            return _repository.FirstOrDefault(el => el.Id == updateDto.Id);
+             
+            return updated.Entity; 
         }
 
         public T? Delete(int id)
@@ -70,6 +72,7 @@ namespace Blog.Services
             else
             {
                 _repository.Remove(entity);
+                _context.SaveChanges(); 
             }
             return entity;
         }

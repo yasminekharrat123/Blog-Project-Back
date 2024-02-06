@@ -4,6 +4,8 @@ using Blog.Models;
 using Blog.ResponseExceptions;
 using Blog.Services;
 using System.Linq;
+using BlogModel = Blog.Models.Blog;
+
 
 namespace Blog.Middleware
 {
@@ -12,11 +14,13 @@ namespace Blog.Middleware
     {
         // TO be replaced with
         // private readonly IBlogService _blogService;
-        private readonly IGenericService<Models.Blog> _GenericService;
+
+        private readonly IGenericService<BlogModel> _GenericService;
 
 
         //param to be replaced with IBlogService blogService
-        public BlogOwnerMiddleware(IGenericService<Models.Blog> blogService)
+        public BlogOwnerMiddleware(IGenericService<BlogModel> blogService)
+
         {
             // _blogService = blogService;
             _GenericService = blogService;
