@@ -28,7 +28,8 @@ namespace Blog.Context
         .HasOne(c => c.ParentComment)
         .WithMany(c => c.Replies)
         .HasForeignKey(c => c.ParentCommentId)
-        .IsRequired(false);
+        .IsRequired(false)
+        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.User)

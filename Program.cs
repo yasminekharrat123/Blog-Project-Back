@@ -6,6 +6,8 @@ using Blog.Services;
 using Blog.Middleware;
 using Blog;
 using Blog.Services.FileService;
+using Blog.Services.Comments;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +33,7 @@ builder.Services.AddHttpClient("OpenAI", client =>
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IFileValidationService, FileValidationService>();
 
-
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 
 builder.Services.AddTransient<IOpenAIService, OpenAIService>();
@@ -44,7 +46,21 @@ builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new BadRequestExceptionFilter());
 });
+
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    });
+
+
 var app = builder.Build();
+
+
+
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

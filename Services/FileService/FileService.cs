@@ -68,7 +68,7 @@ namespace Blog.Services.FileService
 
             foreach (var file in imageFiles)
             {
-                if (!this._fileValidationService.ValidateImageFile(file)) throw new ResponseExceptions.BadRequestException("Please upload a valid image file that has a 10Mb limit!");
+                if (!this._fileValidationService.ValidateImageFile(file)) throw new ResponseExceptions.BadRequestException("Please upload valid image files that have a 10Mb limit!");
             }
             
             List<string> result = new List<string>();
