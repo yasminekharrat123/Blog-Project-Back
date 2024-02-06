@@ -92,9 +92,8 @@ namespace Blog.Services.Comments
             return paginatedReplies;
         }
 
-        public Comment CreateComment(int userId, int blogId, int? parentCommentId, string content)
+        public Comment CreateComment(User user, int? blogId, int? parentCommentId, string content)
         {
-            var user = _context.Users.FirstOrDefault(c => c.Id == userId);
             Comment? parentComment = null;
             if(parentCommentId != null)
             {
@@ -104,10 +103,13 @@ namespace Blog.Services.Comments
                     throw new ResponseExceptions.BaseResponseException($"Comment with ID {parentCommentId} does not exist.", ResponseExceptions.StatusCodes.NOT_FOUND);
                 }
             }
-            var blog = _context.Blogs.FirstOrDefault(c => c.Id == blogId);
-            if(blog == null)
-            {
-                throw new ResponseExceptions.BaseResponseException($"Blog with ID {blogId} does not exist.", ResponseExceptions.StatusCodes.NOT_FOUND);
+            Models.Blog? blog = null;
+            if(blogId != null) { 
+                blog = _context.Blogs.FirstOrDefault(c => c.Id == blogId);
+                if(blog == null)
+                {
+                    throw new ResponseExceptions.BaseResponseException($"Blog with ID {blogId} does not exist.", ResponseExceptions.StatusCodes.NOT_FOUND);
+                }
             }
 
             var comment = new Comment { User = user, Blog = blog, ParentComment = parentComment ,   Content = content };
@@ -117,17 +119,25 @@ namespace Blog.Services.Comments
             return comment;
         }
 
-        public Comment UpdateComment(int commentId, string updatedContent)
+        public Comment UpdateComment(User user, int commentId, string updatedContent)
         {
             var comment = FindComment(commentId);
+            if(comment.User.Id != user.Id)
+            {
+                throw new ResponseExceptions.BaseResponseException($"Comment does not belong to user.", ResponseExceptions.StatusCodes.FORBIDDEN);
+            } 
             comment.Content = updatedContent;
             _context.SaveChanges();
             return comment;
         }
 
-        public void DeleteComment(int commentId)
+        public void DeleteComment(User user, int commentId)
         {
             var comment = FindComment(commentId);
+            if (comment.User.Id != user.Id)
+            {
+                throw new ResponseExceptions.BaseResponseException($"Comment does not belong to user.", ResponseExceptions.StatusCodes.FORBIDDEN);
+            }
             _context.Comments.Remove(comment);
             _context.SaveChanges();
             

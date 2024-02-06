@@ -2,10 +2,10 @@
 
 namespace Blog.Dto.CommentDto
 {
-    public class CreateCommentDto
+    public class CreateReplyDto
     {
         [Required]
         public string Content { get; set; }
-        public int BlogId { get; set; }
+        public int ParentCommentId { get; set; }
     }
 }

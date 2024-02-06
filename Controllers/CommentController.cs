@@ -1,4 +1,5 @@
 ﻿using Blog.Dto.CommentDto;
+using Blog.Middleware;
 using Blog.Models;
 using Blog.Services.Comments;
 using Microsoft.AspNetCore.Mvc;
@@ -6,8 +7,11 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System;
 using System.Collections.Generic;
 
+
+
 namespace Blog.Controllers
 {
+    [ServiceFilter(typeof(AuthMiddleware))]
     [ApiController]
     [Route("comments")]
     public class CommentsController : ControllerBase
@@ -22,10 +26,22 @@ namespace Blog.Controllers
         [HttpPost()]
         public IActionResult CreateComment([FromBody] CreateCommentDto commentDto)
         {
+
             if(!ModelState.IsValid) return BadRequest(ModelState);
-            var comment = _commentService.CreateComment(commentDto.UserId, commentDto.BlogId, commentDto.ParentCommentId, commentDto.Content);
+            User user = (User)HttpContext.Items["user"];
+            var comment = _commentService.CreateComment(user, commentDto.BlogId, null, commentDto.Content);
             return Ok(comment);
             
+        }
+
+        [HttpPost("reply")]
+        public IActionResult ReplyToComment([FromBody] CreateReplyDto commentDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            User user = (User)HttpContext.Items["user"];
+            var comment = _commentService.CreateComment(user, null, commentDto.ParentCommentId, commentDto.Content);
+            return Ok(comment);
+
         }
 
 
@@ -54,7 +70,8 @@ namespace Blog.Controllers
         public IActionResult UpdateComment(int commentId, [FromBody] UpdateCommentDto commentDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var updatedComment = _commentService.UpdateComment(commentId, commentDto.Content);
+            User user = (User)HttpContext.Items["user"];
+            var updatedComment = _commentService.UpdateComment(user, commentId, commentDto.Content);
                 return Ok(updatedComment);
 
         }
@@ -62,15 +79,10 @@ namespace Blog.Controllers
         [HttpDelete("{commentId}")]
         public IActionResult DeleteComment(int commentId)
         {
-            try
-            {
-                _commentService.DeleteComment(commentId);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            User user = (User)HttpContext.Items["user"];
+            _commentService.DeleteComment(user, commentId);
+            return NoContent();
+            
         }
 
 
