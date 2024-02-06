@@ -150,6 +150,8 @@ namespace Blog.Blog
             blog.Comments = GetCommentsByBlog(-1, -1, blog).ToList(); 
             var minBlog =  new MinimalBlogResponseDto(blog); 
             minBlog.CommentCount = GetCommentCountByBlog(blog);
+            minBlog.LikeCount = GetLikeCountByBlog(blog);
+
             return minBlog; 
         }
 

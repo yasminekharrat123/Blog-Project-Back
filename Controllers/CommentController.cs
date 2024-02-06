@@ -11,7 +11,6 @@ using System.Collections.Generic;
 
 namespace Blog.Controllers
 {
-    [ServiceFilter(typeof(AuthMiddleware))]
     [ApiController]
     [Route("comments")]
     public class CommentsController : ControllerBase
@@ -24,23 +23,27 @@ namespace Blog.Controllers
         }
 
         [HttpPost()]
+        [ServiceFilter(typeof(AuthMiddleware))]
+
         public IActionResult CreateComment([FromBody] CreateCommentDto commentDto)
         {
 
             if(!ModelState.IsValid) return BadRequest(ModelState);
             User user = (User)HttpContext.Items["user"];
             var comment = _commentService.CreateComment(user, commentDto.BlogId, null, commentDto.Content);
-            return Ok(comment);
+            return Ok(new CommentResponseDto(comment));
             
         }
 
         [HttpPost("reply")]
+        [ServiceFilter(typeof(AuthMiddleware))]
+
         public IActionResult ReplyToComment([FromBody] CreateReplyDto commentDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             User user = (User)HttpContext.Items["user"];
             var comment = _commentService.CreateComment(user, null, commentDto.ParentCommentId, commentDto.Content);
-            return Ok(comment);
+            return Ok( new CommentResponseDto( comment));
 
         }
 
@@ -49,7 +52,8 @@ namespace Blog.Controllers
         public IActionResult GetComment(int commentId)
         {
             var comment = _commentService.FindComment(commentId);
-            return Ok(comment);
+
+            return Ok(new CommentResponseDto( comment));
         }
 
 
@@ -60,23 +64,28 @@ namespace Blog.Controllers
         {
  
                 var replies = _commentService.GetRepliesByComment(commentId, recursionDepth, page, limit);
-                return Ok(replies);
+           var repliesRespones = replies.Select(c => new CommentResponseDto(c)); 
+                return Ok(repliesRespones);
 
         }
 
 
 
         [HttpPut("{commentId}")]
+        [ServiceFilter(typeof(AuthMiddleware))]
+
         public IActionResult UpdateComment(int commentId, [FromBody] UpdateCommentDto commentDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             User user = (User)HttpContext.Items["user"];
             var updatedComment = _commentService.UpdateComment(user, commentId, commentDto.Content);
-                return Ok(updatedComment);
+                return Ok( new CommentResponseDto( updatedComment ) );
 
         }
 
         [HttpDelete("{commentId}")]
+        [ServiceFilter(typeof(AuthMiddleware))]
+
         public IActionResult DeleteComment(int commentId)
         {
             User user = (User)HttpContext.Items["user"];
