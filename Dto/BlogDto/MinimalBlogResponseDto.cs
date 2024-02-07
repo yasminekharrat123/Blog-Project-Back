@@ -13,7 +13,6 @@ namespace Blog.Dto.BlogDto
         public string MarkdownPath { get; set; }
         public int LikeCount { get; set; }
         public int CommentCount { get; set; }
-        public int UserId { get; set; }
 
         public ICollection<CommentResponseDto> Comments { get; set; } 
         public int PublisherId { get; set; }
@@ -30,10 +29,9 @@ namespace Blog.Dto.BlogDto
             Title = blog.Title;
             Description = blog.Description;
             MarkdownPath = blog.MarkdownPath;
-            PublisherId = blog.UserId;
-            UserId = blog.UserId;
-            Comments = blog.Comments.Select(c => new CommentResponseDto(c)).ToList();
-
+            PublisherId = blog.UserId; 
+                Comments = blog.Comments.Select(c => new CommentResponseDto(c)).ToList();
+          
 
         }
 

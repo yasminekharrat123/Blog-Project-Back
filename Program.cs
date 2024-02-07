@@ -12,7 +12,6 @@ using System.Text.Json.Serialization;
 using LikeService;
 
 using Blog.Blog;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,16 +72,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "The AI-powered Blog API",
-        Version = "v1",
-        Description = "This is the API for the AI-powered blog. It is used to create, read, update, and delete blogs. It also has endpoints for evaluating, enhancing, and correcting blog posts using AI.",
-    });
-});
-
 var app = builder.Build();
 
 
@@ -95,11 +84,7 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
 }
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "AI-BLOG API V1");
-});
+
 app.UseCors();
 app.Use(async (context, next) =>
 {

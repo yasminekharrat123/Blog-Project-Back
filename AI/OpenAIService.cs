@@ -4,21 +4,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using Blog.Dto.AI;
+
 namespace AI
 {
     public interface IOpenAIService
     {
-        string Evaluate(BlogAIDto blog);
-        string CorrectGrammar(BlogAIDto blog);
-        string EnhanceText(BlogAIDto blog);
+        string Evaluate(Blog.Models.Blog blog);
+        string CorrectGrammar(Blog.Models.Blog blog);
+        string EnhanceText(Blog.Models.Blog blog);
         string SuggestNewTitle(String body);
 
 
     }
     public class OpenAIService : IOpenAIService
     {
-        public string Evaluate(BlogAIDto blog)
+        public string Evaluate(Blog.Models.Blog blog)
         {
             var formattingFunctionSpecs = new
             {
@@ -125,7 +125,7 @@ namespace AI
                 {
                     role = "user",
                     content =
-                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} with the blog body {blog.Description} \n"+
+                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} \n"+
                             "I'm seeking an evaluation of the blog post's overall quality, coherence, and persuasiveness. Specifically, I'd like feedback on the following aspects:"+
 
                             "1. Clarity and Structure: Does the blog post have a clear and logical structure? Are the main points well-organized and easy to follow? elaborate in 3 to 4 lines and give a rating out of 10"+
@@ -146,7 +146,7 @@ namespace AI
             return payloadJson;
 
         }
-        public string CorrectGrammar(BlogAIDto blog)
+        public string CorrectGrammar(Blog.Models.Blog blog)
         {
             var formattingFunctionSpecs = new
             {
@@ -162,7 +162,7 @@ namespace AI
                             type = "string",
                             description = "the corrected title of the blog",
                         },
-                        description = new
+                        body = new
                         {
                             type = "string",
                             description = "the corrected body of the blog",
@@ -187,7 +187,7 @@ namespace AI
                 {
                     role = "user",
                     content =
-                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} with the blog body {blog.Description} \n \n Please correct any grammar or phrasing mistakes in the title and body of this blog. \n"
+                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} \n \n Please correct any grammar or phrasing mistakes in the title and body of this blog. \n"
 
                 },
                 },
@@ -198,7 +198,7 @@ namespace AI
             return payloadJson;
 
         }
-        public string EnhanceText(BlogAIDto blog)
+        public string EnhanceText(Blog.Models.Blog blog)
         {
             var formattingFunctionSpecs = new
             {
@@ -214,7 +214,7 @@ namespace AI
                             type = "string",
                             description = "the enhanced title of the blog",
                         },
-                        description = new
+                        body = new
                         {
                             type = "string",
                             description = "the enhanced body of the blog",
@@ -239,7 +239,7 @@ namespace AI
                 {
                     role = "user",
                     content =
-                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} with the blog body {blog.Description} \n As a literary expert, please enhance the writing quality of this blog. \n Focus on improving the flow, elegance, and overall literary quality of both the title and the body."
+                            $"Pretend you're a literary expert. Consider this blog titled: {blog.Title} \n As a literary expert, please enhance the writing quality of this blog. \n Focus on improving the flow, elegance, and overall literary quality of both the title and the body."
 
                 },
                 },

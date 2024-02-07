@@ -5,21 +5,25 @@ using Blog.ResponseExceptions;
 using Blog.Services;
 using System.Linq;
 using BlogModel = Blog.Models.Blog;
-using Blog.Blog;
+
 
 namespace Blog.Middleware
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class BlogOwnerMiddleware : ActionFilterAttribute
     {
+        // TO be replaced with
+        // private readonly IBlogService _blogService;
 
-        private readonly IBlogService _blogService;
+        private readonly IGenericService<BlogModel> _GenericService;
 
 
-        public BlogOwnerMiddleware(IBlogService blogService)
+        //param to be replaced with IBlogService blogService
+        public BlogOwnerMiddleware(IGenericService<BlogModel> blogService)
 
         {
-            _blogService = blogService;
+            // _blogService = blogService;
+            _GenericService = blogService;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -36,7 +40,8 @@ namespace Blog.Middleware
                 throw new UnauthorizedException("Blog not found");
             }
 
-            var blog = _blogService.GetBlogById(blogId);
+            // var blog = _blogService.GetBlogById(blogId);
+            var blog = _GenericService.FindById(blogId);
             if (blog == null)
             {
                 throw new UnauthorizedException("Blog not found");

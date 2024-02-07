@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using Newtonsoft.Json.Linq;
-using Blog.Dto.AI;
 
 namespace AI
 {
@@ -21,18 +20,18 @@ namespace AI
         }
 
         [HttpPost("evaluate")]
-        public async Task<IActionResult> EvaluateBlog([FromBody] BlogAIDto blog)
+        public async Task<IActionResult> EvaluateBlog([FromBody] Blog.Models.Blog blog)
         {
             return await HandleOpenAIRequest(blog, _openAIService.Evaluate);
         }
         [HttpPost("grammar")]
-        public async Task<IActionResult> CorrectBlog([FromBody] BlogAIDto blog)
+        public async Task<IActionResult> CorrectBlog([FromBody] Blog.Models.Blog blog)
         {
             return await HandleOpenAIRequest(blog, _openAIService.CorrectGrammar);
 
         }
         [HttpPost("enhance")]
-        public async Task<IActionResult> EnhanceBlog([FromBody] BlogAIDto blog)
+        public async Task<IActionResult> EnhanceBlog([FromBody] Blog.Models.Blog blog)
         {
             return await HandleOpenAIRequest(blog, _openAIService.EnhanceText);
 
