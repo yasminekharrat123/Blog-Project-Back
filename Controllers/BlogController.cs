@@ -84,6 +84,8 @@ namespace Blog.Controllers
 
         [HttpDelete("{blogId}")]
         [ServiceFilter(typeof(AuthMiddleware))]
+        [ServiceFilter(typeof(BlogOwnerMiddleware))]
+
         public async Task<IActionResult> DeleteBlog([FromRoute] int blogId)
         {
             var user = (User)HttpContext.Items["user"]!;
@@ -98,21 +100,14 @@ namespace Blog.Controllers
         }
         [HttpPatch("{blogId}")]
         [ServiceFilter(typeof(AuthMiddleware))]
+        [ServiceFilter(typeof(BlogOwnerMiddleware))]
         public async Task<IActionResult> UpdateBlog([FromRoute] int blogId, [FromForm] UpdateBlogDto updateBlogDto)
         {
-            var user = (User)HttpContext.Items["user"]!;
-            if (user == null) { throw new BadRequestException("Unexpected?"); }
             updateBlogDto.BlogId = blogId;
             BlogModel blog = _blogService.FindById(updateBlogDto.BlogId);
-
-
             if (blog == null)
             {
                 throw new NotFoundException("No Blog with such Id");
-            }
-            if (blog.UserId != user.Id)
-            {
-                throw new UnauthorizedException("You are not the owner of this blog");
             }
 
 
