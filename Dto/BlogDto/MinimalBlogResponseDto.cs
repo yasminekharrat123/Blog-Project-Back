@@ -32,7 +32,11 @@ namespace Blog.Dto.BlogDto
             MarkdownPath = blog.MarkdownPath;
             PublisherId = blog.UserId;
             UserId = blog.UserId;
-            Comments = blog.Comments.Select(c => new CommentResponseDto(c)).ToList();
+            if (blog.Comments != null)
+            {
+                Comments = blog.Comments.Select(c => new CommentResponseDto(c)).ToList();
+
+            }
 
 
         }
