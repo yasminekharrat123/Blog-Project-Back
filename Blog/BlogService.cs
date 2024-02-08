@@ -126,7 +126,8 @@ namespace Blog.Blog
             /// Waiting File service
             newBlog.MarkdownPath = await _fileService.UploadMarkdownFile(createDto.UploadedMarkdownFile);
             newBlog.CreationDate = DateTime.UtcNow;
-            return new MinimalBlogResponseDto(Create(newBlog));
+            newBlog = this.Create(newBlog);
+            return new MinimalBlogResponseDto(newBlog);
 
         }
 
